@@ -1,0 +1,11 @@
+; BIND zone example for SNO (all three cluster names point at the single node).
+; Replace sno / example.lab / IPs with your values.
+$TTL 3600
+@               IN SOA  ns1.example.lab. admin.example.lab. ( 2026100501 3600 900 604800 300 )
+                IN NS   ns1.example.lab.
+ns1             IN A    192.168.10.1
+registry        IN A    192.168.10.10     ; bastion running mirror-registry
+sno-node01      IN A    192.168.10.20     ; the SNO node
+api.sno         IN A    192.168.10.20
+api-int.sno     IN A    192.168.10.20
+*.apps.sno      IN A    192.168.10.20

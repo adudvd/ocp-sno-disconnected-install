@@ -1,0 +1,18 @@
+# Never commit secrets or install artifacts
+pull-secret*.json
+auth.json
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+bundle/
+bin/
+mirror-registry/
+sno-install/
+auth/
+*.iso
+*.tar
+*.tar.gz
+.openshift_install*
+working-dir/
+*.bak

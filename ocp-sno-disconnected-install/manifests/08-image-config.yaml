@@ -1,0 +1,15 @@
+# Cluster image configuration: trust the registry CA (see 07) and
+# optionally restrict pulls to the mirror registry only.
+apiVersion: config.openshift.io/v1
+kind: Image
+metadata:
+  name: cluster
+spec:
+  additionalTrustedCA:
+    name: registry-ca
+  # registrySources:
+  #   allowedRegistries:
+  #     - registry.example.lab:8443
+  #     - image-registry.openshift-image-registry.svc:5000
+  #     - quay.io            # keep: release images are referenced by quay.io digest and redirected via IDMS
+  #     - registry.redhat.io

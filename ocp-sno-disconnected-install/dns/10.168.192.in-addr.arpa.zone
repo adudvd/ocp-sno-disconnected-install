@@ -1,0 +1,6 @@
+; Reverse zone: the node's PTR should resolve to its hostname.
+$TTL 3600
+@   IN SOA ns1.example.lab. admin.example.lab. ( 2026100501 3600 900 604800 300 )
+    IN NS  ns1.example.lab.
+10  IN PTR registry.example.lab.
+20  IN PTR sno-node01.example.lab.

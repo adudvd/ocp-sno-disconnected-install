@@ -1,0 +1,52 @@
+# agent-config.yaml for the Agent-based Installer (Single Node OpenShift)
+# Static IP example. For DHCP, delete the whole `networkConfig` block
+# (DHCP must then hand out the IP given in rendezvousIP and a resolvable hostname).
+#
+# Static networking requires `nmstatectl` on the host where you run
+# `openshift-install agent create image` (dnf install -y nmstate).
+#
+# NOTE: openshift-install CONSUMES (deletes) this file. Keep a backup copy.
+apiVersion: v1beta1
+kind: AgentConfig
+metadata:
+  name: sno                               # must match metadata.name in install-config.yaml
+rendezvousIP: 192.168.10.20               # <NODE_IP> for SNO this is the node itself
+
+# Optional: NTP servers reachable inside the disconnected network
+additionalNTPSources:
+  - 192.168.10.1                          # <NTP_SERVER>
+
+hosts:
+  - hostname: sno-node01                  # <NODE_HOSTNAME>
+    role: master
+    interfaces:
+      - name: eno1                        # <NIC_NAME> any name; matched by MAC below
+        macAddress: 52:54:00:aa:bb:01     # <NODE_NIC_MAC>
+    # Pin the install disk so the installer never picks the wrong one.
+    # Use one of: deviceName, hctl, wwn, serialNumber, by-path...
+    rootDeviceHints:
+      deviceName: /dev/sda                # <INSTALL_DISK>  (or /dev/nvme0n1, /dev/vda)
+    networkConfig:
+      interfaces:
+        - name: eno1
+          type: ethernet
+          state: up
+          mac-address: 52:54:00:aa:bb:01
+          ipv4:
+            enabled: true
+            dhcp: false
+            address:
+              - ip: 192.168.10.20         # <NODE_IP>
+                prefix-length: 24         # <PREFIX>
+          ipv6:
+            enabled: false
+      dns-resolver:
+        config:
+          server:
+            - 192.168.10.1                # <DNS_SERVER>
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 192.168.10.1  # <GATEWAY>
+            next-hop-interface: eno1
+            table-id: 254

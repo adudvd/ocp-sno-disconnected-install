@@ -1,0 +1,15 @@
+# CatalogSource (OLM classic) pointing at the mirrored, filtered operator index.
+# oc-mirror v2 generates: cs-redhat-operator-index-v4-22.yaml
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: cs-redhat-operator-index-v4-22
+  namespace: openshift-marketplace
+spec:
+  displayName: Red Hat Operators (mirrored)
+  publisher: Local mirror
+  sourceType: grpc
+  image: registry.example.lab:8443/redhat/redhat-operator-index:v4.22
+  updateStrategy:
+    registryPoll:
+      interval: 30m

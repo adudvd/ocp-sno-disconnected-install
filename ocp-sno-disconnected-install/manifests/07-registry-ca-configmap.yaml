@@ -1,0 +1,15 @@
+# Trust the mirror registry CA for image pulls/imports done by the cluster
+# (ImageStreams, builds, OSUS). The key MUST be "<host>..<port>" (two dots).
+# After creating it apply 08-image-config.yaml, or run:
+#   oc patch image.config.openshift.io/cluster --type merge \
+#     -p '{"spec":{"additionalTrustedCA":{"name":"registry-ca"}}}'
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: registry-ca
+  namespace: openshift-config
+data:
+  registry.example.lab..8443: |
+    -----BEGIN CERTIFICATE-----
+    <PASTE_MIRROR_REGISTRY_ROOT_CA_HERE>
+    -----END CERTIFICATE-----

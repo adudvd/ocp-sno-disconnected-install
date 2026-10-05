@@ -1,0 +1,10 @@
+# Disable the default internet-facing catalog sources (they cannot be reached).
+# Apply with: oc apply -f 06-operatorhub-disable-defaults.yaml
+# (equivalent: oc patch OperatorHub cluster --type json \
+#   -p '[{"op":"add","path":"/spec/disableAllDefaultSources","value":true}]')
+apiVersion: config.openshift.io/v1
+kind: OperatorHub
+metadata:
+  name: cluster
+spec:
+  disableAllDefaultSources: true

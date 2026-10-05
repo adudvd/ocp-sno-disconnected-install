@@ -1,0 +1,74 @@
+# install-config.yaml for a Single Node OpenShift (SNO) 4.22.11 cluster
+# installed with the Agent-based Installer in a disconnected network.
+#
+# Replace every value marked <...>. Never commit the real file:
+# it contains your mirror registry credentials and SSH public key.
+#
+# NOTE: openshift-install CONSUMES (deletes) this file when it builds the ISO.
+#       Keep a backup copy, e.g. install-config.yaml.bak
+apiVersion: v1
+baseDomain: example.lab                 # <BASE_DOMAIN>
+metadata:
+  name: sno                             # <CLUSTER_NAME>  => api.sno.example.lab, *.apps.sno.example.lab
+
+compute:
+  - architecture: amd64
+    hyperthreading: Enabled
+    name: worker
+    replicas: 0                         # SNO: no dedicated workers
+controlPlane:
+  architecture: amd64
+  hyperthreading: Enabled
+  name: master
+  replicas: 1                           # SNO: exactly one control-plane node
+
+networking:
+  networkType: OVNKubernetes
+  machineNetwork:
+    - cidr: 192.168.10.0/24             # <MACHINE_NETWORK_CIDR> subnet of the node IP
+  clusterNetwork:
+    - cidr: 10.128.0.0/14
+      hostPrefix: 23
+  serviceNetwork:
+    - 172.30.0.0/16
+
+platform:
+  none: {}                              # SNO on bare metal / VM without platform integration
+
+# Leave unset to install the default set; or trim capabilities for a smaller footprint:
+# capabilities:
+#   baselineCapabilitySet: None
+#   additionalEnabledCapabilities:
+#     - marketplace
+#     - OperatorLifecycleManager
+#     - Console
+#     - Ingress
+
+fips: false
+
+# Pull secret for the LOCAL mirror registry only (no Red Hat registry access needed).
+# Generate the base64 auth value with:  echo -n '<user>:<password>' | base64 -w0
+pullSecret: '{"auths":{"registry.example.lab:8443":{"auth":"<BASE64_USER_COLON_PASSWORD>","email":"admin@example.lab"}}}'
+
+# Public key only (e.g. contents of ~/.ssh/id_ed25519.pub). Used for `ssh core@<node>`.
+sshKey: 'ssh-ed25519 AAAA<REPLACE_WITH_YOUR_PUBLIC_KEY> admin@bastion'
+
+# Root CA of the mirror registry (mirror-registry creates <quayRoot>/quay-config/rootCA.pem;
+# older releases use <quayRoot>/quay-rootCA/rootCA.pem).
+# Indentation matters: every line of the PEM must be indented by 2 spaces.
+additionalTrustBundlePolicy: Always
+additionalTrustBundle: |
+  -----BEGIN CERTIFICATE-----
+  <PASTE_MIRROR_REGISTRY_ROOT_CA_HERE>
+  -----END CERTIFICATE-----
+
+# Copied from <workspace>/working-dir/cluster-resources/idms-oc-mirror.yaml after
+# running oc-mirror v2. The two entries below are what oc-mirror v2 generates
+# for the OpenShift release payload.
+imageDigestSources:
+  - mirrors:
+      - registry.example.lab:8443/openshift/release
+    source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+  - mirrors:
+      - registry.example.lab:8443/openshift/release-images
+    source: quay.io/openshift-release-dev/ocp-release
